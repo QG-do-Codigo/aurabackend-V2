@@ -1,0 +1,29 @@
+services:
+  aura-api:
+    container_name: aura-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - aura-db
+    restart: unless-stopped
+
+  aura-db:
+    image: postgres:16-alpine
+    container_name: aura-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: aura
+      POSTGRES_USER: aura
+      POSTGRES_PASSWORD: aura
+    volumes:
+      - aura_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  aura_pgdata:

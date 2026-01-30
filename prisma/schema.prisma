@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String            @id @default(uuid())
+  name          String
+  email         String            @unique
+  passwordHash  String            @map("password_hash")
+
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  tasks         Task[]
+  notes         Note[]
+  shoppingItems ShoppingItem[]
+  healthReminders HealthReminder[]
+  bills         Bill[]
+  sleepGoals    SleepGoal[]
+  ideas         Idea[]
+
+  @@map("users")
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  title       String
+  description String?
+  category    String?
+  completed   Boolean  @default(false)
+  priority    Int?
+  dueDate     DateTime? @map("due_date")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("tasks")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notes")
+}
+
+model ShoppingItem {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  quantity  String?
+  purchased Boolean  @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("shopping_items")
+}
+
+model HealthReminder {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  title       String
+  description String?
+  time        DateTime
+  repeatDaily Boolean  @default(false) @map("repeat_daily")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("health_reminders")
+}
+
+model Bill {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  amount    Decimal
+  dueDate   DateTime @map("due_date")
+  paid      Boolean  @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("bills")
+}
+
+model SleepGoal {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  goalHours      Decimal  @map("goal_hours")
+  averageHours   Decimal? @map("average_hours")
+  bedtimeRoutine String?  @map("bedtime_routine")
+  alarmTime      DateTime? @map("alarm_time")
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("sleep_goals")
+}
+
+model Idea {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  type      String
+  content   String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("ideas")
+}
