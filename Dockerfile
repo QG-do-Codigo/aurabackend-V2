@@ -1,22 +1,22 @@
 FROM node:20-alpine
 
-# Diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia arquivos de dependências
-COPY package*.json ./
+# Ativa pnpm
+RUN corepack enable
 
-# Instala dependências
-RUN npm install
+# Copia dependências
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Copia o restante do projeto
 COPY . .
 
-# Compila o Nest
-RUN npm run build
+# 🔥 BUILD O NEST
+RUN pnpm build
 
-# Porta padrão do Nest
+# Expõe a porta
 EXPOSE 3000
 
-# Comando para rodar a aplicação
-CMD ["npm", "run", "start:prod"]
+# Roda em produção
+CMD ["pnpm", "start:prod"]
