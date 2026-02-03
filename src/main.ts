@@ -11,6 +11,7 @@ async function bootstrap() {
     transform: false, //transforma os tipos primitivos (string, number, boolean) conforme definido no DTO
   }
 ))
+console.log('porta', process.env.PORT);
   await app.listen(process.env.PORT ?? 3000);
   
 }
