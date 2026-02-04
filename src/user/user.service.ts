@@ -1,8 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserController } from './user.controller';
-import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+
 import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -27,7 +28,6 @@ export class UserService {
 
       return users;
     } catch (error) {
-      console.log(error);
       throw new HttpException('Erro ao buscas usuários', 500)
     }
   }

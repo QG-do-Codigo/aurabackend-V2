@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+
 
 @Controller('users')
 export class UserController {
