@@ -1,17 +1,4 @@
 services:
-  aura-api:
-    container_name: aura-api
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    depends_on:
-      - aura-db
-    restart: unless-stopped
-
   aura-db:
     image: postgres:16-alpine
     container_name: aura-db
