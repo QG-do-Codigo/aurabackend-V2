@@ -33,6 +33,7 @@ export class TaskService {
       const tasks = await this.prisma.task.findMany({
         where: { userId: userId },
       });
+      console.log("Retrieved tasks for user:", tasks);
       return tasks;
     } catch (error) {
       throw error;
