@@ -7,7 +7,7 @@ import { UpdateTaskDto } from "./dto/updateTask.dto";
 export class TaskService {
   constructor(private prisma: PrismaService) {}
 
-  async createTask(createTaskDto: CreateTaskDto) {
+  async createTask(createTaskDto: CreateTaskDto, userId: string) {
     try {
       if (!createTaskDto) {
         throw new Error("createTaskDto is undefined");
@@ -20,8 +20,7 @@ export class TaskService {
           completed: createTaskDto.completed,
           priority: createTaskDto.priority,
           dueDate: createTaskDto.dueDate,
-          //user fixo enquanto task de autenticação n esta pronta
-          user: { connect: { id: "edee1e04-01b4-492b-bccc-ecc5e63079c7" } },
+          userId: userId,
         },
       });
     } catch (error) {
@@ -29,8 +28,15 @@ export class TaskService {
     }
   }
 
-  async getTasks() {
-    return this.prisma.task.findMany({});
+  async getTasksByUser(userId: string) {
+    try {
+      const tasks = await this.prisma.task.findMany({
+        where: { userId: userId },
+      });
+      return tasks;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updateTask(id: string, updateTaskDto: UpdateTaskDto) {
