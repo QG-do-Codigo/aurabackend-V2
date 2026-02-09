@@ -28,15 +28,18 @@ export class TaskService {
     }
   }
 
-  async getTasksByUser(userId: string) {
-    try {
-      const tasks = await this.prisma.task.findMany({
-        where: { userId: userId },
-      });
-      return tasks;
-    } catch (error) {
-      throw error;
-    }
+  async getTasksByUser(
+    userId: string,
+    category?: string,
+    orderByPriority?: "asc" | "desc"
+  ) {
+    return this.prisma.task.findMany({
+      where: {
+        userId,
+        ...(category && { category }),
+      },
+      orderBy: orderByPriority ? { priority: orderByPriority } : undefined,
+    });
   }
 
   async updateTask(id: string, updateTaskDto: UpdateTaskDto) {

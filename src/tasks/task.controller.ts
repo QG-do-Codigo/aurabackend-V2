@@ -6,6 +6,8 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from "@nestjs/common";
@@ -29,9 +31,13 @@ export class TasksController {
 
   @UseGuards(AuthTokenGuard)
   @Get("list")
-  getTasks(@CurrentUser() user: any) {
+  getTasks(
+    @CurrentUser() user: any,
+    @Query("category") category?: string,
+    @Query("priority") priority?: "asc" | "desc"
+  ) {
     const userId = user.sub;
-    return this.taskService.getTasksByUser(userId);
+    return this.taskService.getTasksByUser(userId, category, priority);
   }
 
   @UseGuards(AuthTokenGuard)
