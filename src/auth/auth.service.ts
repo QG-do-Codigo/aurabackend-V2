@@ -60,7 +60,6 @@ export class AuthService {
 
 
     } catch (error) {
-      console.log(error);
       // instanceof verifica se o erro é uma instância dessa classe (ou herda dela)
       if (error instanceof HttpException) {
         throw error;

@@ -6,11 +6,14 @@ import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { SignInDto } from 'src/auth/dto/signin.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     private prismaService: PrismaService,
+    private authService: AuthService,
 
     private readonly hashingService: HashingServiceProtocol
 
@@ -86,20 +89,23 @@ export class UserService {
           email: createUserDto.email,
           name: createUserDto.name,
           passwordHash: passwordHash
-        },
-        select: {
-          email: true,
-          name: true
         }
       })
 
-      return newUser;
+      
+      const signInDto = {
+        email: newUser.email,
+        password: createUserDto.password,
+      };
+
+      return this.authService.SignIn(signInDto);
+
     } catch (error) {
       // instanceof verifica se o erro é uma instância dessa classe (ou herda dela)
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException("Erro ao atualizar usuário", 500)
+      throw new HttpException("Erro ao cadastrar usuário", 500)
     }
   }
 
@@ -113,12 +119,14 @@ export class UserService {
 
       if(!user){throw new NotFoundException("Usuário não encontrado!")}
 
-      console.log(user?.id);
-      console.log(tokenPayLoad?.sub);
+      if(user.email){
+        throw new HttpException("Email não pode ser atualizado", 403)
+      }
 
       if(user?.id !== tokenPayLoad?.sub){
-        throw new HttpException("Usuário não autorizadooooooooooooo", 403)
+        throw new HttpException("Usuário não autorizado", 401)
       }
+
 
       const dataUser: { name?: string, password?: string} = {
         name:  updateUserDto.name ? updateUserDto.name: user.name
@@ -146,7 +154,7 @@ export class UserService {
         throw error;
       }
 
-      throw new HttpException("Erro ao tentar atualizar o úsuario!", 500)
+      throw new HttpException("Erro atualizar o úsuario!", 500)
     }
   }
 

@@ -5,11 +5,14 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { APP_FILTER } from '@nestjs/core';
 import { ApiExceptionFilter } from 'src/common/filters/exception-filter';
+import { AuthModule } from 'src/auth/auth.module';
+import { AuthService } from 'src/auth/auth.service';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, AuthModule],
   providers: [
     UserService,
+    AuthService,
      {
       provide: APP_FILTER,
       useClass: ApiExceptionFilter
