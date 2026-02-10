@@ -86,10 +86,6 @@ export class UserService {
           email: createUserDto.email,
           name: createUserDto.name,
           passwordHash: passwordHash
-        },
-        select: {
-          email: true,
-          name: true
         }
       })
 
@@ -99,7 +95,7 @@ export class UserService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException("Erro ao atualizar usuário", 500)
+      throw new HttpException("Erro ao cadastrar usuário", 500)
     }
   }
 
@@ -113,8 +109,6 @@ export class UserService {
 
       if(!user){throw new NotFoundException("Usuário não encontrado!")}
 
-      console.log(user?.id);
-      console.log(tokenPayLoad?.sub);
 
       if(user?.id !== tokenPayLoad?.sub){
         throw new HttpException("Usuário não autorizadooooooooooooo", 403)
@@ -146,7 +140,7 @@ export class UserService {
         throw error;
       }
 
-      throw new HttpException("Erro ao tentar atualizar o úsuario!", 500)
+      throw new HttpException("Erro atualizar o úsuario!", 500)
     }
   }
 
