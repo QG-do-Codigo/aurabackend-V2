@@ -51,4 +51,13 @@ export class UpdateTaskDto {
   @IsOptional()
   @Type(() => Date)
   dueDate?: Date;
+
+  @ApiProperty({
+    example: "#FF5733",
+    description: "Cor associada à tarefa (opcional)",
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  color?: string;
 }
