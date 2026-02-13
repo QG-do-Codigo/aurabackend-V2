@@ -30,7 +30,7 @@ export class NoteService {
       return note;
     } catch (error) {
       if (error instanceof HttpException) {
-        return error
+        throw error
       }
 
       throw new HttpException("Erro interno do servidor", 500)
@@ -60,7 +60,11 @@ export class NoteService {
       return note;
 
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
 
+      throw new HttpException("Erro interno do servidor", 500)
     }
   }
 
@@ -83,7 +87,7 @@ export class NoteService {
       return note;
     } catch (error) {
       if (error instanceof HttpException) {
-        return error
+        throw error
       }
 
       throw new HttpException("Erro interno do servidor", 500)
@@ -125,7 +129,7 @@ export class NoteService {
     } catch (error) {
 
       if (error instanceof HttpException) {
-        return error
+        throw error
       }
       throw new HttpException("Erro interno do servidor", 500)
     }
@@ -176,7 +180,7 @@ export class NoteService {
       }
     } catch (error) {
       if (error instanceof HttpException) {
-        return error
+        throw error
       }
 
       throw new HttpException("Erro interno do servidor", 500)
@@ -213,7 +217,7 @@ export class NoteService {
 
     } catch (error) {
       if (error instanceof HttpException) {
-        return error
+        throw error
       }
 
       throw new HttpException("Erro interno do servidor", 500)
