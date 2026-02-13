@@ -12,6 +12,7 @@ export class TaskService {
       if (!createTaskDto) {
         throw new Error("createTaskDto is undefined");
       }
+
       return this.prisma.task.create({
         data: {
           title: createTaskDto.title,
@@ -20,6 +21,7 @@ export class TaskService {
           completed: createTaskDto.completed,
           priority: createTaskDto.priority,
           dueDate: createTaskDto.dueDate,
+          color: createTaskDto.color,
           userId: userId,
         },
       });
