@@ -70,7 +70,7 @@ export class NoteService {
 
   async findOne(id: string, tokenPayLoad: PayloadTokenDto) {
     try {
-      if (tokenPayLoad.sub) {
+      if (!tokenPayLoad.sub) {
         throw new HttpException("Usúario não logado!", 400)
       }
 
