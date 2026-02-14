@@ -33,7 +33,11 @@ export class UserService {
 
       return users;
     } catch (error) {
-      throw new HttpException('Erro ao buscas usuários', 500)
+      if(error instanceof HttpException){
+        throw error;
+      }
+
+      throw new HttpException("Erro ao buscar usuário", 500)
     }
   }
 
@@ -49,9 +53,6 @@ export class UserService {
         throw new NotFoundException("Usuário não encontrado")
       }
 
-      console.log(user?.id);
-      console.log(tokenPayLoad?.sub);
-
       if(user?.id !== tokenPayLoad?.sub){
         throw new HttpException("Usuário não autorizado", 403)
       }
@@ -60,7 +61,6 @@ export class UserService {
 
       
     }catch(error){
-      console.log(error);
       if(error instanceof HttpException){
         throw error;
       }

@@ -46,10 +46,11 @@ model Task {
 }
 
 model Note {
-  id      String @id @default(uuid())
-  userId  String @map("user_id")
-  title   String
-  content String
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
+  color String? @default("#FFFFFF")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
