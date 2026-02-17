@@ -50,6 +50,8 @@ export class CreateTaskDto {
 
   @IsString()
   @IsOptional()
+  userId?: string;
+  
   @ApiProperty({
     example: "#FF5733",
     description: "Cor associada à tarefa (opcional)",
