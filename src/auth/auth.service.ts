@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly jwtService: JwtService,
   ) {
-    console.log(this.jwtConfiguration);
+
   }
 
 

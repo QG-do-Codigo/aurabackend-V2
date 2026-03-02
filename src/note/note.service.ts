@@ -147,16 +147,17 @@ export class NoteService {
         }
       })
 
-      const verifyTitleNote = await this.prismaService.note.findFirst({
-        where:{
-          title: updateNoteDto.title
+      if(updateNoteDto.title){
+        const verifyTitleNote = await this.prismaService.note.findFirst({
+          where:{
+            title: updateNoteDto.title
+          }
+        })
+        if(verifyTitleNote){
+          throw new HttpException("Titulo já cadastrado", 404)
         }
-      })
-
-      if(verifyTitleNote){
-        throw new HttpException("Titulo já cadastrado", 404)
       }
-
+      
       if (!note) {
         throw new HttpException('Nota não encontrada', 404)
       }
