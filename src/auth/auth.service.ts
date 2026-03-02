@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HashingServiceProtocol } from './hash/hashing.service';
 import { SignInDto } from './dto/signin.dto';
 import jwtConfig from './config/jwt-config';
-import type{ ConfigType } from '@nestjs/config';
+import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class AuthService {
   }
 
 
-  async SignIn(signInDto: SignInDto){
+  async SignIn(signInDto: SignInDto) {
     try {
       const user = await this.prisma.user.findFirst({
         where: {
@@ -28,20 +28,20 @@ export class AuthService {
         }
       })
 
-      if(!user){
+      if (!user) {
         throw new HttpException('Login ou senha inválidos', 401);
       }
 
       const passwordMatch = await this.hashingService.compare(signInDto.password, user.passwordHash);
 
-      if(!passwordMatch){
+      if (!passwordMatch) {
         throw new HttpException('Login ou senha inválidos', 401);
       }
 
       const token = await this.jwtService.signAsync(
         {
-        sub: user.id,
-        email: user.email,
+          sub: user.id,
+          email: user.email,
         },
         {
           secret: this.jwtConfiguration.secret,
@@ -51,7 +51,7 @@ export class AuthService {
         }
       )
 
-      return{ 
+      return {
         email: user.email,
         name: user.name,
         token: token,
@@ -68,7 +68,7 @@ export class AuthService {
     }
   }
 
-  async SignOut(token?: string){
+  async SignOut(token?: string) {
     // when called from controller we will pass the raw bearer token; allow call without
     // token for flexibility (e.g. tests).
     if (!token) {
