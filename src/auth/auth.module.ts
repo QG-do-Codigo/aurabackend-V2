@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BcryptService } from './hash/bcrypt.service';
 import jwtConfig from './config/jwt-config';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthTokenGuard } from './guard/auth.token.guard';
 
 @Global()
 @Module({
@@ -18,12 +19,15 @@ import { JwtModule } from '@nestjs/jwt';
       provide: HashingServiceProtocol,
       useClass: BcryptService
     },
-    AuthService
+    AuthService,
+    AuthTokenGuard
   ],
   exports: [
     HashingServiceProtocol,
     JwtModule,
-    ConfigModule
+    ConfigModule,
+    AuthService,
+    AuthTokenGuard
   ],
   controllers: [AuthController]
 })

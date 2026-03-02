@@ -68,4 +68,35 @@ export class AuthService {
     }
   }
 
+  async SignOut(token?: string){
+    // when called from controller we will pass the raw bearer token; allow call without
+    // token for flexibility (e.g. tests).
+    if (!token) {
+      return { message: 'Token ausente' };
+    }
+
+    // decode expiration so we can store it if available
+    const decoded = this.jwtService.decode(token) as { exp?: number } | null;
+    const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000) : undefined;
+
+    // `tokenBlacklist` may not yet be present on PrismaService until `npx prisma generate` is run
+    await (this.prisma as any).tokenBlacklist.create({
+      data: {
+        token,
+        expiresAt: expiresAt ?? new Date(),
+      },
+    });
+
+    return {
+      message: 'Logout realizado com sucesso',
+    };
+  }
+
+  async isBlacklisted(token: string): Promise<boolean> {
+    const record = await (this.prisma as any).tokenBlacklist.findUnique({
+      where: { token },
+    });
+    return !!record;
+  }
+
 }
