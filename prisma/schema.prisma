@@ -46,11 +46,11 @@ model Task {
 }
 
 model Note {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  title     String
-  content   String
-  color String? @default("#FFFFFF")
+  id      String  @id @default(uuid())
+  userId  String  @map("user_id")
+  title   String
+  content String
+  color   String? @default("#FFFFFF")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -72,7 +72,19 @@ model ShoppingItem {
 
   user User @relation(fields: [userId], references: [id])
 
+  category   Category_Shopping @relation(fields: [categoryId], references: [id])
+  categoryId String            @map("category_id")
+
   @@map("shopping_items")
+}
+
+model Category_Shopping {
+  id            String         @id @default(uuid())
+  hortifruti    String
+  laticinios    String
+  mercearia     String
+  limpeza       String
+  shoppingItems ShoppingItem[]
 }
 
 model HealthReminder {
