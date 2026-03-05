@@ -85,6 +85,8 @@ model Category_Shopping {
   mercearia     String
   limpeza       String
   shoppingItems ShoppingItem[]
+
+  @@map("categories_shopping")
 }
 
 model HealthReminder {
