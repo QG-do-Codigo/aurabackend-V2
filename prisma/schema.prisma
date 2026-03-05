@@ -46,11 +46,11 @@ model Task {
 }
 
 model Note {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  title     String
-  content   String
-  color String? @default("#FFFFFF")
+  id      String  @id @default(uuid())
+  userId  String  @map("user_id")
+  title   String
+  content String
+  color   String? @default("#FFFFFF")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -110,8 +110,8 @@ model Bill {
 model SleepGoal {
   id             String    @id @default(uuid())
   userId         String    @map("user_id")
-  goalHours      Decimal   @map("goal_hours")
-  averageHours   Decimal?  @map("average_hours")
+  goalHours      Float     @map("goal_hours")
+  averageHours   Float?    @map("average_hours")
   bedtimeRoutine String?   @map("bedtime_routine")
   alarmTime      DateTime? @map("alarm_time")
 
