@@ -7,13 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import { ShoppingService } from "./shopping.service";
 import { CreateShoppingDto } from "./dto/create-shopping.dto";
 import { UpdateShoppingDto } from "./dto/update-shopping.dto";
 import { CurrentUser } from "src/decorators/CurrentUser";
 import { AuthTokenGuard } from "src/auth/guard/auth.token.guard";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
 
 @UseGuards(AuthTokenGuard)
 @Controller("shopping")
@@ -34,10 +35,32 @@ export class ShoppingController {
   @ApiOperation({ summary: "Listar tarefas do usuário autenticado" })
   @ApiResponse({ status: 200, description: "Tarefas listadas com sucesso" })
   @ApiResponse({ status: 401, description: "Não autorizado" })
+  @ApiQuery({
+    name: "categoryId",
+    required: false,
+    description: "Filtrar por ID da categoria",
+  })
+  @ApiQuery({
+    name: "category",
+    required: false,
+    description: "Filtrar por nome da categoria",
+  })
   @Get("list")
-  findAll(@CurrentUser() user: any) {
+  findAll(
+    @CurrentUser() user: any,
+    @Query("categoryId") categoryId?: string,
+    @Query("category") category?: string
+  ) {
     const userId = user.sub;
-    return this.shoppingService.findAll(userId);
+    return this.shoppingService.findAll(userId, categoryId, category);
+  }
+
+  @ApiOperation({ summary: "Listar categorias de compras" })
+  @ApiResponse({ status: 200, description: "Categorias listadas com sucesso" })
+  @ApiResponse({ status: 401, description: "Não autorizado" })
+  @Get("categories")
+  findAllCategories() {
+    return this.shoppingService.findAllCategories();
   }
 
   @ApiOperation({ summary: "Atualizar status" })

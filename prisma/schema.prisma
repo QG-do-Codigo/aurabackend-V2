@@ -72,18 +72,15 @@ model ShoppingItem {
 
   user User @relation(fields: [userId], references: [id])
 
-  category   Category_Shopping @relation(fields: [categoryId], references: [id])
-  categoryId String            @map("category_id")
+  category   CategoryShopping @relation(fields: [categoryId], references: [id])
+  categoryId String           @map("category_id")
 
   @@map("shopping_items")
 }
 
-model Category_Shopping {
+model CategoryShopping {
   id            String         @id @default(uuid())
-  hortifruti    String
-  laticinios    String
-  mercearia     String
-  limpeza       String
+  name          String         @unique
   shoppingItems ShoppingItem[]
 
   @@map("categories_shopping")
