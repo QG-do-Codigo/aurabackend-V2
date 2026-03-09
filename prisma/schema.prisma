@@ -148,3 +148,10 @@ model Idea {
 
   @@map("ideas")
 }
+
+model TokenBlacklist {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
