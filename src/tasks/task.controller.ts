@@ -19,12 +19,12 @@ import { CurrentUser } from "src/decorators/CurrentUser";
 import { ApiTags } from "@nestjs/swagger";
 import { ApiOperation, ApiResponse, ApiQuery } from "@nestjs/swagger";
 
+@UseGuards(AuthTokenGuard)
 @ApiTags("Tasks")
 @Controller("tasks")
 export class TasksController {
   constructor(private readonly taskService: TaskService) {}
 
-  @UseGuards(AuthTokenGuard)
   @ApiOperation({ summary: "Criar uma nova tarefa para o usuário autenticado" })
   @ApiResponse({ status: 201, description: "Tarefa criada com sucesso" })
   @Post("create")
@@ -33,7 +33,6 @@ export class TasksController {
     return this.taskService.createTask(createTaskDto, userId);
   }
 
-  @UseGuards(AuthTokenGuard)
   @ApiOperation({
     summary: "Listar tarefas do usuário autenticado com filtros e ordenação",
   })
@@ -58,7 +57,6 @@ export class TasksController {
     return this.taskService.getTasksByUser(userId, category, priority);
   }
 
-  @UseGuards(AuthTokenGuard)
   @ApiOperation({ summary: "Atualizar uma tarefa pelo ID" })
   @ApiResponse({ status: 200, description: "Tarefa atualizada com sucesso" })
   @ApiResponse({ status: 401, description: "Não autorizado" })
@@ -69,7 +67,6 @@ export class TasksController {
     return this.taskService.updateTask(id, updateTaskDto);
   }
 
-  @UseGuards(AuthTokenGuard)
   @ApiOperation({ summary: "Excluir uma tarefa pelo ID" })
   @ApiResponse({ status: 200, description: "Tarefa excluída com sucesso" })
   @ApiResponse({ status: 401, description: "Não autorizado" })
