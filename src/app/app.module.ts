@@ -7,6 +7,7 @@ import { AuthModule } from "src/auth/auth.module";
 import { TaskModule } from "src/tasks/task.module";
 import { NoteModule } from "src/note/note.module";
 import { HealthModule } from "src/health/health.module";
+import { ShoppingModule } from "src/shopping/shopping.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { HealthModule } from "src/health/health.module";
     TaskModule,
     NoteModule,
     HealthModule,
+    ShoppingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
