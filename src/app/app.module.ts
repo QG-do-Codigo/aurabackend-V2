@@ -7,6 +7,7 @@ import { AuthModule } from "src/auth/auth.module";
 import { TaskModule } from "src/tasks/task.module";
 import { NoteModule } from "src/note/note.module";
 import { SleepModule } from "src/sleep/sleep.module";
+import { ShoppingModule } from "src/shopping/shopping.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SleepModule } from "src/sleep/sleep.module";
     TaskModule,
     NoteModule,
     SleepModule,
+    ShoppingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

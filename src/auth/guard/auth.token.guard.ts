@@ -1,16 +1,19 @@
-import {  CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import {  CanActivate, ExecutionContext, Global, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "src/prisma/prisma.service";
+import { AuthService } from "../auth.service";
 import jwtConfig from "../config/jwt-config";
 import type { ConfigType } from '@nestjs/config';
 import { REQUEST_TOKEN_PAYLOAD_NAME } from "../common/auth.constants";
 import { Request } from "express";
 
+@Global()
 @Injectable()
 export class AuthTokenGuard implements CanActivate {
     constructor(
         private readonly jwtService: JwtService,
         private readonly prismaService: PrismaService,
+        private readonly authService: AuthService,
 
         @Inject(jwtConfig.KEY)
         private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
@@ -28,6 +31,11 @@ export class AuthTokenGuard implements CanActivate {
 
         try {
             const payload = await this.jwtService.verifyAsync(token, this.jwtConfiguration);
+
+            // check blacklisted tokens
+            if (await this.authService.isBlacklisted(token)) {
+                throw new UnauthorizedException("Token revogado");
+            }
 
             const user = await this.prismaService.user.findFirst({
                 where: {
