@@ -48,7 +48,14 @@ export class CreateTaskDto {
   @IsDate()
   dueDate?: Date;
 
-  // @IsString()
-  // @IsOptional()
-  // userId?: string;
+  @IsString()
+  @IsOptional()
+  userId?: string;
+  
+  @ApiProperty({
+    example: "#FF5733",
+    description: "Cor associada à tarefa (opcional)",
+    required: false,
+  })
+  color?: string;
 }
