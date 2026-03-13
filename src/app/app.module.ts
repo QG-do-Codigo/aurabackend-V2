@@ -6,6 +6,7 @@ import { PrismaModule } from "src/prisma/prisma.module";
 import { AuthModule } from "src/auth/auth.module";
 import { TaskModule } from "src/tasks/task.module";
 import { NoteModule } from "src/note/note.module";
+import { SleepModule } from "src/sleep/sleep.module";
 import { ShoppingModule } from "src/shopping/shopping.module";
 
 @Module({
@@ -15,6 +16,7 @@ import { ShoppingModule } from "src/shopping/shopping.module";
     UserModule,
     TaskModule,
     NoteModule,
+    SleepModule,
     ShoppingModule,
   ],
   controllers: [AppController],
