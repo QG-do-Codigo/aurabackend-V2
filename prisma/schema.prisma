@@ -121,8 +121,8 @@ model Bill {
 model SleepGoal {
   id             String    @id @default(uuid())
   userId         String    @map("user_id")
-  goalHours      Decimal   @map("goal_hours")
-  averageHours   Decimal?  @map("average_hours")
+  goalHours      Float     @map("goal_hours")
+  averageHours   Float?    @map("average_hours")
   bedtimeRoutine String?   @map("bedtime_routine")
   alarmTime      DateTime? @map("alarm_time")
 
