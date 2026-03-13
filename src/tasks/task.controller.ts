@@ -75,4 +75,13 @@ export class TasksController {
   deleteTask(@Param("id") id: string) {
     return this.taskService.deleteTask(id);
   }
+
+  @ApiOperation({ summary: "Excluir todas as tarefas do usuário autenticado" })
+  @ApiResponse({ status: 200, description: "Tarefas excluídas com sucesso" })
+  @ApiResponse({ status: 401, description: "Não autorizado" })
+  @Delete("deleteAll")
+  deleteAllTasks(@CurrentUser() user: any) {
+    const userId = user.sub;
+    return this.taskService.deleteAllTasks(userId);
+  }
 }
