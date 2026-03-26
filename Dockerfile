@@ -12,6 +12,9 @@ RUN pnpm install --frozen-lockfile
 # Copia o restante do projeto
 COPY . .
 
+# Gera o Prisma Client antes do build
+RUN pnpm prisma generate
+
 # 🔥 BUILD O NEST
 RUN pnpm build
 
