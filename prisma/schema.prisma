@@ -22,6 +22,7 @@ model User {
   bills           Bill[]
   sleepGoals      SleepGoal[]
   ideas           Idea[]
+  healthLogs      HealthLog[]
 
   @@map("users")
 }
@@ -87,10 +88,13 @@ model CategoryShopping {
 }
 
 model HealthReminder {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
+  id          String  @id @default(uuid())
+  userId      String  @map("user_id")
   title       String
   description String?
+
+  type HealthType @default(MEDICINE)
+
   time        DateTime
   repeatDaily Boolean  @default(false) @map("repeat_daily")
 
@@ -99,7 +103,26 @@ model HealthReminder {
 
   user User @relation(fields: [userId], references: [id])
 
+  logs HealthLog[]
+
   @@map("health_reminders")
+}
+
+model HealthLog {
+  id         String @id @default(uuid())
+  reminderId String @map("reminder_id")
+  userId     String @map("user_id")
+
+  date        DateTime
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  reminder HealthReminder @relation(fields: [reminderId], references: [id])
+  user     User           @relation(fields: [userId], references: [id])
+
+  @@index([userId, date])
+  @@unique([reminderId, date])
+  @@map("health_logs")
 }
 
 model Bill {
@@ -154,4 +177,9 @@ model TokenBlacklist {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+enum HealthType {
+  MEDICINE
+  WORKOUT
 }
