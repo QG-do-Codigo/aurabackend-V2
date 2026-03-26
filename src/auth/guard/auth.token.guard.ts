@@ -48,9 +48,9 @@ export class AuthTokenGuard implements CanActivate {
             }
 
             request[REQUEST_TOKEN_PAYLOAD_NAME] = payload;
-            
+         
         } catch (error) {
-            console.log(error);
+            
             throw new UnauthorizedException("Acesso não autorizado")
         }
 
