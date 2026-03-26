@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserController } from './user.controller';
 
@@ -101,19 +101,13 @@ export class UserService {
       return this.authService.SignIn(signInDto);
 
     } catch (error) {
-  // Isso aparecerá nos logs do painel do Render
-  console.error("DETALHE DO ERRO NO RENDER:", error); 
-
-  if (error instanceof HttpException) {
-    throw error;
-  }
-
-  // O segundo parâmetro deve ser o código de status (ex: 500 ou 400)
-  throw new HttpException(
-    error.message || "Erro ao cadastrar usuário", 
-    HttpStatus.INTERNAL_SERVER_ERROR
-  );
-}
+   
+  
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException("Erro ao cadastrar usuário", error)
+    }
   }
 
   async UpdateUser(id: string, updateUserDto: UpdateUserDto, tokenPayLoad: PayloadTokenDto){
