@@ -101,13 +101,13 @@ export class UserService {
       return this.authService.SignIn(signInDto);
 
     } catch (error) {
-      console.log(error);
+   
       
       // instanceof verifica se o erro é uma instância dessa classe (ou herda dela)
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException("Erro ao cadastrar usuário", 500)
+      throw new HttpException("Erro ao cadastrar usuário", error)
     }
   }
 
