@@ -27,16 +27,6 @@ model User {
   @@map("users")
 }
 
-enum Category {
-  COMPRAS
-  AFAZERES
-  ESTUDOS
-  TRABALHO
-  FINANCAS
-  SAUDE
-  LAZER
-}
-
 model Task {
   id          String    @id @default(uuid())
   userId      String    @map("user_id")
@@ -192,4 +182,14 @@ model TokenBlacklist {
 enum HealthType {
   MEDICINE
   WORKOUT
+}
+
+enum Category {
+  COMPRAS
+  AFAZERES
+  ESTUDOS
+  TRABALHO
+  FINANCAS
+  SAUDE
+  LAZER
 }
