@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Param,
+  ParseEnumPipe,
   Patch,
   Post,
   Query,
@@ -26,7 +28,7 @@ import { Category } from "@prisma/client";
 @ApiTags("Tasks")
 @Controller("tasks")
 export class TasksController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(private readonly taskService: TaskService) { }
 
   @ApiOperation({ summary: "Criar uma nova tarefa para o usuário autenticado" })
   @ApiResponse({ status: 201, description: "Tarefa criada com sucesso" })
@@ -53,22 +55,33 @@ export class TasksController {
   @Get("list")
   getTasks(
     @CurrentUser() user: any,
-    @Query("category") category?: Category,
+    @Query("category") category?: string,
   ) {
     const userId = user.sub;
-    return this.taskService.getTasksByUser(userId, category);
+
+    if (category && !Object.values(Category).includes(category as Category)) {
+      throw new BadRequestException({
+        message: "Categoria inválida",
+        details: `A categoria '${category}' não existe. Valores permitidos: ${Object.values(Category).join(", ")}`,
+      });
+    }
+
+    return this.taskService.getTasksByUser(
+      userId,
+      category as Category,
+    );
   }
 
-  @ApiOperation({ summary: "Listar tarefas pela categoria"})
-  @ApiResponse({ status: 200, description: "Tarefa por categoria listada com sucesso"})
-  @ApiResponse({ status: 401, description: "Não autorizado"})
-  @ApiResponse({  status: 404, description: "Tarefa não encontrada"})
+  @ApiOperation({ summary: "Listar tarefas pela categoria" })
+  @ApiResponse({ status: 200, description: "Tarefa por categoria listada com sucesso" })
+  @ApiResponse({ status: 401, description: "Não autorizado" })
+  @ApiResponse({ status: 404, description: "Tarefa não encontrada" })
   @Get("category/:category")
-  @UsePipes(new ValidationPipe({ transform: true}))
+  @UsePipes(new ValidationPipe({ transform: true }))
   getTaskByCategory(
     @Param("category") category: Category,
     @TOKEN_PAYLOAD_PARAM() tokenPayLoad: PayloadTokenDto
-  ){
+  ) {
     return this.taskService.getTasksByCategory(category, tokenPayLoad)
   }
 
