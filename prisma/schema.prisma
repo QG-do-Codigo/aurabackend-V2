@@ -7,22 +7,19 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(uuid())
-  name         String
-  email        String @unique
-  passwordHash String @map("password_hash")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  tasks           Task[]
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  passwordHash    String           @map("password_hash")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  bills           Bill[]
+  healthReminders HealthReminder[]
+  ideas           Idea[]
   notes           Note[]
   shoppingItems   ShoppingItem[]
-  healthReminders HealthReminder[]
-  bills           Bill[]
   sleepGoals      SleepGoal[]
-  ideas           Idea[]
-  healthLogs      HealthLog[]
+  tasks           Task[]
 
   @@map("users")
 }
@@ -32,111 +29,68 @@ model Task {
   userId      String    @map("user_id")
   title       String
   description String?
-  category    Category
+  category    String?
   completed   Boolean   @default(false)
   priority    Int?
   dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   color       String?   @map("color")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@map("tasks")
 }
 
 model Note {
-  id      String  @id @default(uuid())
-  userId  String  @map("user_id")
-  title   String
-  content String
-  color   String? @default("#FFFFFF")
-
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  color     String?  @default("#FFFFFF")
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("notes")
 }
 
 model ShoppingItem {
-  id        String  @id @default(uuid())
-  userId    String  @map("user_id")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
   name      String
   quantity  String?
-  purchased Boolean @default(false)
-
+  purchased Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  category   CategoryShopping @relation(fields: [categoryId], references: [id])
-  categoryId String           @map("category_id")
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("shopping_items")
 }
 
-model CategoryShopping {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  shoppingItems ShoppingItem[]
-
-  @@map("categories_shopping")
-}
-
 model HealthReminder {
-  id          String  @id @default(uuid())
-  userId      String  @map("user_id")
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
   title       String
   description String?
-
-  type HealthType @default(MEDICINE)
-
   time        DateTime
   repeatDaily Boolean  @default(false) @map("repeat_daily")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  logs HealthLog[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id])
 
   @@map("health_reminders")
 }
 
-model HealthLog {
-  id         String @id @default(uuid())
-  reminderId String @map("reminder_id")
-  userId     String @map("user_id")
-
-  date        DateTime
-  completed   Boolean   @default(false)
-  completedAt DateTime?
-
-  reminder HealthReminder @relation(fields: [reminderId], references: [id])
-  user     User           @relation(fields: [userId], references: [id])
-
-  @@index([userId, date])
-  @@unique([reminderId, date])
-  @@map("health_logs")
-}
-
 model Bill {
-  id      String   @id @default(uuid())
-  userId  String   @map("user_id")
-  name    String
-  amount  Decimal
-  dueDate DateTime @map("due_date")
-  paid    Boolean  @default(false)
-
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  amount    Decimal
+  dueDate   DateTime @map("due_date")
+  paid      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("bills")
 }
@@ -144,30 +98,26 @@ model Bill {
 model SleepGoal {
   id             String    @id @default(uuid())
   userId         String    @map("user_id")
-  goalHours      Float     @map("goal_hours")
-  averageHours   Float?    @map("average_hours")
+  goalHours      Decimal   @map("goal_hours")
+  averageHours   Decimal?  @map("average_hours")
   bedtimeRoutine String?   @map("bedtime_routine")
   alarmTime      DateTime? @map("alarm_time")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  user           User      @relation(fields: [userId], references: [id])
 
   @@map("sleep_goals")
 }
 
 model Idea {
-  id      String @id @default(uuid())
-  userId  String @map("user_id")
-  title   String
-  type    String
-  content String
-
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  type      String
+  content   String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("ideas")
 }
@@ -177,19 +127,4 @@ model TokenBlacklist {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
-}
-
-enum HealthType {
-  MEDICINE
-  WORKOUT
-}
-
-enum Category {
-  COMPRAS
-  AFAZERES
-  ESTUDOS
-  TRABALHO
-  FINANCAS
-  SAUDE
-  LAZER
 }
