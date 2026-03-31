@@ -1,11 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { CreateIdeaDto } from './dto/create-idea.dto';
-import { UpdateIdeaDto } from './dto/update-idea.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateIdeaDto } from "./dto/create-idea.dto";
+import { UpdateIdeaDto } from "./dto/update-idea.dto";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class IdeaService {
-  create(createIdeaDto: CreateIdeaDto) {
-    return 'This action adds a new idea';
+  constructor(private prisma: PrismaService) {}
+  async create(data: CreateIdeaDto, userId: string) {
+    return this.prisma.idea.create({
+      data: {
+        title: data.title,
+        content: data.content,
+
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+
+        category: {
+          connect: {
+            id: data.categoryId,
+          },
+        },
+      },
+    });
   }
 
   findAll() {
