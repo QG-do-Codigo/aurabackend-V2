@@ -1,12 +1,15 @@
 import {
   IsBoolean,
   IsDate,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
+import { Category } from "@prisma/client";
+
 
 export class UpdateTaskDto {
   @ApiProperty({ example: "Estudar NestJS", description: "Título da tarefa" })
@@ -23,10 +26,14 @@ export class UpdateTaskDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ example: "Trabalho", description: "Categoria da tarefa" })
-  @IsString()
+  @ApiProperty({ 
+    example: "TRABALHO", 
+    description: "Categoria da tarefa",
+    enum: Category                    // ← MUDAR
+  })
+  @IsEnum(Category)
   @IsOptional()
-  category?: string;
+  category?: Category;
 
   @ApiProperty({
     example: false,
