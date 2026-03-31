@@ -32,7 +32,7 @@ model Task {
   userId      String    @map("user_id")
   title       String
   description String?
-  category    String?
+  category    Category
   completed   Boolean   @default(false)
   priority    Int?
   dueDate     DateTime? @map("due_date")
@@ -182,4 +182,14 @@ model TokenBlacklist {
 enum HealthType {
   MEDICINE
   WORKOUT
+}
+
+enum Category {
+  COMPRAS
+  AFAZERES
+  ESTUDOS
+  TRABALHO
+  FINANCAS
+  SAUDE
+  LAZER
 }

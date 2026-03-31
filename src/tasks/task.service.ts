@@ -1,7 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { CreateTaskDto } from "./dto/createTask.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateTaskDto } from "./dto/updateTask.dto";
+import { PayloadTokenDto } from "src/auth/dto/payload-token.dto";
+import { Category } from "@prisma/client";
 
 @Injectable()
 export class TaskService {
@@ -31,32 +33,60 @@ export class TaskService {
   }
 
   async getTasksByUser(
-    userId: string,
-    category?: string,
-    orderByPriority?: "asc" | "desc"
-  ) {
-    return this.prisma.task.findMany({
+  userId: string,
+  category?: Category,
+) {
+  return this.prisma.task.findMany({
+    where: {
+      userId,
+      ...(category && { category }),
+    },
+  });
+}
+
+async getTasksByCategory(
+  category: Category,
+  tokenPayLoad: PayloadTokenDto,
+) {
+  try {
+    if (!tokenPayLoad.sub) {
+      throw new HttpException("Usuário não logado!", 400);
+    }
+
+    const tasks = await this.prisma.task.findMany({
       where: {
-        userId,
-        ...(category && { category }),
+        userId: tokenPayLoad.sub,
+        category: category,
       },
-      orderBy: orderByPriority ? { priority: orderByPriority } : undefined,
     });
+
+    return tasks;
+  } catch (error) {
+    console.log("Error fetching tasks by category:", error);
   }
+}
 
   async updateTask(id: string, updateTaskDto: UpdateTaskDto) {
-    const updated = await this.prisma.task.update({
-      where: { id },
-      data: updateTaskDto,
-    });
-    return updated;
-  }
+  const updated = await this.prisma.task.update({
+    where: { id },
+    data: {
+      ...updateTaskDto,
+    },
+  });
+  return updated;
+}
 
-  async deleteTask(id: string) {
-    return this.prisma.task.delete({ where: { id } });
+  async deleteTask(id: string, tokenPayLoad: PayloadTokenDto) {
+    return this.prisma.task.delete({ 
+      where: { 
+        id,
+        userId: tokenPayLoad.sub
+      } 
+    });
   }
 
   async deleteAllTasks(userId: string) {
+
     return this.prisma.task.deleteMany({ where: { userId } });
   }
 }
