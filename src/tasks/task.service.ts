@@ -9,13 +9,13 @@ import { Category } from "@prisma/client";
 export class TaskService {
   constructor(private prisma: PrismaService) {}
 
-  async createTask(createTaskDto: CreateTaskDto, userId: string) {
+  async createTask(createTaskDto: CreateTaskDto, tokenPayLoad: PayloadTokenDto) {
     try {
       if (!createTaskDto) {
         throw new Error("createTaskDto is undefined");
       }
 
-      return this.prisma.task.create({
+      const newTask = this.prisma.task.create({
         data: {
           title: createTaskDto.title,
           description: createTaskDto.description,
@@ -24,9 +24,11 @@ export class TaskService {
           priority: createTaskDto.priority,
           dueDate: createTaskDto.dueDate,
           color: createTaskDto.color,
-          userId: userId,
+          userId: tokenPayLoad.sub,
         },
       });
+
+      return newTask
     } catch (error) {
       console.log("Error creating task:", error);
     }
