@@ -33,9 +33,11 @@ export class TasksController {
   @ApiOperation({ summary: "Criar uma nova tarefa para o usuário autenticado" })
   @ApiResponse({ status: 201, description: "Tarefa criada com sucesso" })
   @Post("create")
-  create(@Body() createTaskDto: CreateTaskDto, @CurrentUser() user: any) {
-    const userId = user.sub;
-    return this.taskService.createTask(createTaskDto, userId);
+  create(@Body() createTaskDto: CreateTaskDto, 
+  @TOKEN_PAYLOAD_PARAM() tokenPayLoad: PayloadTokenDto
+) {
+    
+    return this.taskService.createTask(createTaskDto, tokenPayLoad);
   }
 
   @ApiOperation({
