@@ -1,6 +1,13 @@
+import { IsString, IsNotEmpty } from "class-validator";
+
 export class CreateIdeaDto {
-  title: string;
-  content: string;
-  userId: string;
-  categoryId: string;
+  @IsString()
+  @IsNotEmpty()
+  title!: string;
+
+  @IsString()
+  content!: string;
+
+  @IsString()
+  categoryId!: string;
 }

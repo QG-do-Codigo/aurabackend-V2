@@ -27,19 +27,45 @@ export class IdeaService {
     });
   }
 
-  findAll() {
-    return `This action returns all idea`;
+  async findAll() {
+    return this.prisma.idea.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        category: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} idea`;
+  async findOne(id: string) {
+    return this.prisma.idea.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateIdeaDto: UpdateIdeaDto) {
-    return `This action updates a #${id} idea`;
+  async update(id: string, updateIdeaDto: UpdateIdeaDto) {
+    return this.prisma.idea.update({
+      where: {
+        id,
+      },
+      data: {
+        title: updateIdeaDto.title,
+        content: updateIdeaDto.content,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} idea`;
+  async remove(id: string) {
+    return this.prisma.idea.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

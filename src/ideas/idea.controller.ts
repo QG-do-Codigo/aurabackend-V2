@@ -32,16 +32,16 @@ export class IdeaController {
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.ideaService.findOne(+id);
+    return this.ideaService.findOne(id);
   }
 
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateIdeaDto: UpdateIdeaDto) {
-    return this.ideaService.update(+id, updateIdeaDto);
+    return this.ideaService.update(id, updateIdeaDto);
   }
 
   @Delete(":id")
   remove(@Param("id") id: string) {
-    return this.ideaService.remove(+id);
+    return this.ideaService.remove(id);
   }
 }
