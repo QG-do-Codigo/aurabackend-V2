@@ -41,6 +41,14 @@ export class IdeaService {
     });
   }
 
+  async findAllCategories() {
+    return this.prisma.ideaCategory.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+
   async findOne(id: string) {
     return this.prisma.idea.findUnique({
       where: {

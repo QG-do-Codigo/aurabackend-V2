@@ -21,6 +21,7 @@ model User {
   healthReminders HealthReminder[]
   bills           Bill[]
   sleepGoals      SleepGoal[]
+  sleepLogs       SleepLog[]
   ideas           Idea[]
   healthLogs      HealthLog[]
 
@@ -155,6 +156,26 @@ model SleepGoal {
   user User @relation(fields: [userId], references: [id])
 
   @@map("sleep_goals")
+}
+
+model SleepLog {
+  id       String   @id @default(dbgenerated("(gen_random_uuid()::TEXT)"))
+  userId   String   @map("user_id")
+  logDate  DateTime @map("log_date") @db.Date
+  bedtime  DateTime @db.Time
+  wakeTime DateTime @map("wake_time") @db.Time
+  durationH Decimal @map("duration_h") @db.Decimal(4, 2) @default(dbgenerated())
+  quality   Int
+  factors   String[] @default([])
+  notes     String?
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, logDate])
+  @@index([userId, logDate(sort: Desc)])
+  @@map("sleep_logs")
 }
 
 model Idea {

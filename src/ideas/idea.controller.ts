@@ -36,6 +36,13 @@ export class IdeaController {
     return this.ideaService.findAll();
   }
 
+  @ApiOperation({ summary: "Listar todas as categorias de ideias" })
+  @ApiResponse({ status: 200, description: "Categorias listadas com sucesso" })
+  @Get("categories")
+  findAllCategories() {
+    return this.ideaService.findAllCategories();
+  }
+
   @ApiOperation({ summary: "Obter detalhes de uma ideia específica" })
   @ApiResponse({ status: 200, description: "Ideia obtida com sucesso" })
   @Get(":id")
