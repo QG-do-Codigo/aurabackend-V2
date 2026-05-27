@@ -24,6 +24,7 @@ model User {
   sleepLogs       SleepLog[]
   ideas           Idea[]
   healthLogs      HealthLog[]
+  transactions    Transaction[]
 
   @@map("users")
 }
@@ -197,6 +198,37 @@ model TokenBlacklist {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model FinanceCategory {
+  id   Int                   @id @default(autoincrement()) @db.SmallInt
+  name String                @unique
+  icon String
+  type String                @db.VarChar(10)
+
+  transactions Transaction[]
+
+  @@map("finance_categories")
+}
+
+model Transaction {
+  id              String                 @id @default(dbgenerated("(gen_random_uuid()::TEXT)"))
+  userId          String                 @map("user_id")
+  name            String
+  amount          Decimal                @db.Decimal(12, 2)
+  type            String                 @db.VarChar(10)
+  categoryId      Int                    @map("category_id") @db.SmallInt
+  transactionDate DateTime               @default(now()) @map("transaction_date") @db.Date
+  notes           String?
+  createdAt       DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category FinanceCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([userId, transactionDate(sort: Desc)])
+  @@index([userId, type])
+  @@map("transactions")
 }
 
 enum HealthType {

@@ -10,6 +10,7 @@ import { HealthModule } from "src/health/health.module";
 import { SleepModule } from "src/sleep/sleep.module";
 import { ShoppingModule } from "src/shopping/shopping.module";
 import { IdeaModule } from "src/ideas/idea.module";
+import { FinanceModule } from "src/finance/finance.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { IdeaModule } from "src/ideas/idea.module";
     SleepModule,
     ShoppingModule,
     IdeaModule,
+    FinanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
