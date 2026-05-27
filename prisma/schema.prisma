@@ -7,22 +7,22 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(uuid())
-  name         String
-  email        String @unique
-  passwordHash String @map("password_hash")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  tasks           Task[]
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  passwordHash    String           @map("password_hash")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  bills           Bill[]
+  healthLogs      HealthLog[]
+  healthReminders HealthReminder[]
+  ideas           Idea[]
   notes           Note[]
   shoppingItems   ShoppingItem[]
-  healthReminders HealthReminder[]
-  bills           Bill[]
   sleepGoals      SleepGoal[]
-  ideas           Idea[]
-  healthLogs      HealthLog[]
+  sleep_logs      sleep_logs[]
+  tasks           Task[]
+  transactions    transactions[]
 
   @@map("users")
 }
@@ -32,49 +32,42 @@ model Task {
   userId      String    @map("user_id")
   title       String
   description String?
-  category    Category
   completed   Boolean   @default(false)
   priority    Int?
   dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   color       String?   @map("color")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  category    Category
+  user        User      @relation(fields: [userId], references: [id])
 
   @@map("tasks")
 }
 
 model Note {
-  id      String  @id @default(uuid())
-  userId  String  @map("user_id")
-  title   String
-  content String
-  color   String? @default("#FFFFFF")
-
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  color     String?  @default("#FFFFFF")
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("notes")
 }
 
 model ShoppingItem {
-  id        String  @id @default(uuid())
-  userId    String  @map("user_id")
-  name      String
-  quantity  String?
-  purchased Boolean @default(false)
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  category   CategoryShopping @relation(fields: [categoryId], references: [id])
+  id         String           @id @default(uuid())
+  userId     String           @map("user_id")
+  name       String
+  quantity   String?
+  purchased  Boolean          @default(false)
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
   categoryId String           @map("category_id")
+  category   CategoryShopping @relation(fields: [categoryId], references: [id])
+  user       User             @relation(fields: [userId], references: [id])
 
   @@map("shopping_items")
 }
@@ -88,55 +81,46 @@ model CategoryShopping {
 }
 
 model HealthReminder {
-  id          String  @id @default(uuid())
-  userId      String  @map("user_id")
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
   title       String
   description String?
-
-  type HealthType @default(MEDICINE)
-
   time        DateTime
-  repeatDaily Boolean  @default(false) @map("repeat_daily")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  logs HealthLog[]
+  repeatDaily Boolean     @default(false) @map("repeat_daily")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  type        HealthType  @default(MEDICINE)
+  logs        HealthLog[]
+  user        User        @relation(fields: [userId], references: [id])
 
   @@map("health_reminders")
 }
 
 model HealthLog {
-  id         String @id @default(uuid())
-  reminderId String @map("reminder_id")
-  userId     String @map("user_id")
-
+  id          String         @id @default(uuid())
+  reminderId  String         @map("reminder_id")
+  userId      String         @map("user_id")
   date        DateTime
-  completed   Boolean   @default(false)
+  completed   Boolean        @default(false)
   completedAt DateTime?
+  reminder    HealthReminder @relation(fields: [reminderId], references: [id])
+  user        User           @relation(fields: [userId], references: [id])
 
-  reminder HealthReminder @relation(fields: [reminderId], references: [id])
-  user     User           @relation(fields: [userId], references: [id])
-
-  @@index([userId, date])
   @@unique([reminderId, date])
+  @@index([userId, date])
   @@map("health_logs")
 }
 
 model Bill {
-  id      String   @id @default(uuid())
-  userId  String   @map("user_id")
-  name    String
-  amount  Decimal
-  dueDate DateTime @map("due_date")
-  paid    Boolean  @default(false)
-
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  amount    Decimal
+  dueDate   DateTime @map("due_date")
+  paid      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("bills")
 }
@@ -148,26 +132,23 @@ model SleepGoal {
   averageHours   Float?    @map("average_hours")
   bedtimeRoutine String?   @map("bedtime_routine")
   alarmTime      DateTime? @map("alarm_time")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  user           User      @relation(fields: [userId], references: [id])
 
   @@map("sleep_goals")
 }
 
 model Idea {
-  id      String @id @default(uuid())
-  userId  String @map("user_id")
-  title   String
-  type    String
-  content String
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id])
+  id              String          @id @default(uuid())
+  userId          String          @map("user_id")
+  title           String
+  content         String
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  category_id     String
+  idea_categories idea_categories @relation(fields: [category_id], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
 
   @@map("ideas")
 }
@@ -177,6 +158,58 @@ model TokenBlacklist {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model finance_categories {
+  id           Int            @id @default(autoincrement()) @db.SmallInt
+  name         String         @unique
+  icon         String
+  type         String         @db.VarChar(10)
+  transactions transactions[]
+}
+
+model idea_categories {
+  id    String @id
+  name  String
+  ideas Idea[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model sleep_logs {
+  id         String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  user_id    String
+  log_date   DateTime @db.Date
+  bedtime    DateTime @db.Time(6)
+  wake_time  DateTime @db.Time(6)
+  duration_h Decimal  @default(dbgenerated("\nCASE\n    WHEN (wake_time >= bedtime) THEN (EXTRACT(epoch FROM (wake_time - bedtime)) / (3600)::numeric)\n    ELSE (EXTRACT(epoch FROM ((wake_time + '24:00:00'::interval) - bedtime)) / (3600)::numeric)\nEND")) @db.Decimal(4, 2)
+  quality    Int
+  factors    String[] @default([])
+  notes      String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, log_date])
+  @@index([user_id, log_date(sort: Desc)])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transactions {
+  id                 String             @id @default(dbgenerated("(gen_random_uuid())::text"))
+  user_id            String
+  name               String
+  amount             Decimal            @db.Decimal(12, 2)
+  type               String             @db.VarChar(10)
+  category_id        Int                @db.SmallInt
+  transaction_date   DateTime           @default(now()) @db.Date
+  notes              String?
+  created_at         DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime           @db.Timestamptz(6)
+  finance_categories finance_categories @relation(fields: [category_id], references: [id])
+  users              User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, transaction_date(sort: Desc)])
+  @@index([user_id, type])
 }
 
 enum HealthType {
