@@ -16,7 +16,7 @@ import { AuthTokenGuard } from "src/auth/guard/auth.token.guard";
 import { ApiOperation, ApiResponse, ApiQuery } from "@nestjs/swagger";
 
 @UseGuards(AuthTokenGuard)
-@Controller("sleep")
+@Controller("sleep/goals")
 export class SleepController {
   constructor(private readonly sleepService: SleepService) {}
 

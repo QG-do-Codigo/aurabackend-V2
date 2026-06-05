@@ -7,32 +7,84 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class ShoppingService {
   constructor(private prisma: PrismaService) {}
 
+  private readonly defaultCategoryNames = [
+    "hortifruti",
+    "laticinios",
+    "mercearia",
+    "limpeza",
+    "uncategorized",
+  ] as const;
+
+  private ensuredDefaults: Promise<void> | null = null;
+
+  private async ensureDefaultCategories() {
+    if (!this.ensuredDefaults) {
+      this.ensuredDefaults = (async () => {
+        const count = await this.prisma.categoryShopping.count();
+        if (count > 0) return;
+
+        await this.prisma.categoryShopping.createMany({
+          data: this.defaultCategoryNames.map((name) => ({ name })),
+          skipDuplicates: true,
+        });
+      })().catch((err) => {
+        this.ensuredDefaults = null;
+        throw err;
+      });
+    }
+
+    await this.ensuredDefaults;
+  }
+
+  private normalizeCategoryName(name: string) {
+    return name.trim().toLowerCase();
+  }
+
   private async resolveCategoryId(categoryId?: string, categoryName?: string) {
+    await this.ensureDefaultCategories();
+
     if (categoryId) {
       const byId = await this.prisma.categoryShopping.findUnique({
         where: { id: categoryId },
         select: { id: true },
       });
 
-      if (!byId) {
-        throw new BadRequestException("categoryId inválido: categoria não encontrada");
-      }
-      return byId.id;
-    }
+      if (byId) return byId.id;
 
-    if (categoryName) {
       const byName = await this.prisma.categoryShopping.findFirst({
-        where: { name: { equals: categoryName, mode: "insensitive" } },
+        where: {
+          name: { equals: this.normalizeCategoryName(categoryId), mode: "insensitive" },
+        },
         select: { id: true },
       });
 
-      if (!byName) {
-        throw new BadRequestException("category inválida: categoria não encontrada");
-      }
-      return byName.id;
+      if (byName) return byName.id;
+
+      throw new BadRequestException(
+        "categoryId inválido: categoria não encontrada (use /shopping/categories para listar)"
+      );
     }
 
-    throw new BadRequestException("categoryId é obrigatório");
+    if (categoryName) {
+      const normalizedName = this.normalizeCategoryName(categoryName);
+      const byName = await this.prisma.categoryShopping.findFirst({
+        where: { name: { equals: normalizedName, mode: "insensitive" } },
+        select: { id: true },
+      });
+
+      if (byName) return byName.id;
+
+      const createdOrExisting = await this.prisma.categoryShopping.upsert({
+        where: { name: normalizedName },
+        update: {},
+        create: { name: normalizedName },
+        select: { id: true },
+      });
+
+      return createdOrExisting.id;
+    }
+
+    throw new BadRequestException("categoryId ou category é obrigatório");
   }
 
   async create(createShoppingDto: CreateShoppingDto, userId: string) {
@@ -78,7 +130,8 @@ export class ShoppingService {
     });
   }
 
-  findAllCategories() {
+  async findAllCategories() {
+    await this.ensureDefaultCategories();
     return this.prisma.categoryShopping.findMany({
       orderBy: {
         name: "asc",
