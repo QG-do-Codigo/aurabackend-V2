@@ -160,12 +160,12 @@ model SleepGoal {
 }
 
 model SleepLog {
-  id       String   @id @default(dbgenerated("(gen_random_uuid()::TEXT)"))
-  userId   String   @map("user_id")
-  logDate  DateTime @map("log_date") @db.Date
-  bedtime  DateTime @db.Time
-  wakeTime DateTime @map("wake_time") @db.Time
-  durationH Decimal @map("duration_h") @db.Decimal(4, 2) @default(dbgenerated())
+  id        String   @id @default(dbgenerated("(gen_random_uuid()::TEXT)"))
+  userId    String   @map("user_id")
+  logDate   DateTime @map("log_date") @db.Date
+  bedtime   DateTime @db.Time
+  wakeTime  DateTime @map("wake_time") @db.Time
+  durationH Decimal  @default(dbgenerated()) @map("duration_h") @db.Decimal(4, 2)
   quality   Int
   factors   String[] @default([])
   notes     String?
@@ -201,10 +201,10 @@ model TokenBlacklist {
 }
 
 model FinanceCategory {
-  id   Int                   @id @default(autoincrement()) @db.SmallInt
-  name String                @unique
+  id   Int    @id @default(autoincrement()) @db.SmallInt
+  name String @unique
   icon String
-  type String                @db.VarChar(10)
+  type String @db.VarChar(10)
 
   transactions Transaction[]
 
@@ -212,16 +212,16 @@ model FinanceCategory {
 }
 
 model Transaction {
-  id              String                 @id @default(dbgenerated("(gen_random_uuid()::TEXT)"))
-  userId          String                 @map("user_id")
+  id              String   @id @default(dbgenerated("(gen_random_uuid()::TEXT)"))
+  userId          String   @map("user_id")
   name            String
-  amount          Decimal                @db.Decimal(12, 2)
-  type            String                 @db.VarChar(10)
-  categoryId      Int                    @map("category_id") @db.SmallInt
-  transactionDate DateTime               @default(now()) @map("transaction_date") @db.Date
+  amount          Decimal  @db.Decimal(12, 2)
+  type            String   @db.VarChar(10)
+  categoryId      Int      @map("category_id") @db.SmallInt
+  transactionDate DateTime @default(now()) @map("transaction_date") @db.Date
   notes           String?
-  createdAt       DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   category FinanceCategory @relation(fields: [categoryId], references: [id])
