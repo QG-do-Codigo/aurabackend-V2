@@ -31,8 +31,21 @@ function toISODate(date: Date) {
 }
 
 function parseISODate(iso: string) {
-  const d = new Date(`${iso}T00:00:00.000Z`);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const d = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   if (Number.isNaN(d.getTime())) return null;
+  if (
+    d.getUTCFullYear() !== year ||
+    d.getUTCMonth() !== month - 1 ||
+    d.getUTCDate() !== day
+  ) {
+    return null;
+  }
   return d;
 }
 
@@ -105,7 +118,7 @@ export class FinanceService {
     await this.ensuredSeed;
   }
 
-  private assertNotFutureDate(dateIso: string) {
+  private parseTransactionDate(dateIso: string) {
     const d = parseISODate(dateIso);
     if (!d) {
       throw new UnprocessableEntityException({
@@ -113,13 +126,18 @@ export class FinanceService {
         details: "Use o formato YYYY-MM-DD",
       });
     }
-    const todayIso = toISODate(new Date());
-    if (dateIso > todayIso) {
+    return d;
+  }
+
+  private parseFilterDate(dateIso: string) {
+    const d = parseISODate(dateIso);
+    if (!d) {
       throw new UnprocessableEntityException({
-        message: "transaction_date não pode ser futura",
-        details: `Data informada: ${dateIso}. Hoje: ${todayIso}`,
+        message: "date inválida",
+        details: "Use o formato YYYY-MM-DD",
       });
     }
+    return d;
   }
 
   private async validateCategory(categoryId: number, type: "income" | "expense") {
@@ -187,19 +205,42 @@ export class FinanceService {
     return { start: startOfYearUtc(year), end: endOfYearUtc(year), label: `${year}` };
   }
 
+  private getTransactionsDateFilter(query: TransactionsQueryDto) {
+    if (query.date) {
+      return { equals: this.parseFilterDate(query.date) };
+    }
+
+    if (query.month !== undefined) {
+      const year = query.year ?? new Date().getUTCFullYear();
+      return {
+        gte: startOfMonthUtc(year, query.month - 1),
+        lte: endOfMonthUtc(year, query.month - 1),
+      };
+    }
+
+    if (query.year !== undefined) {
+      return {
+        gte: startOfYearUtc(query.year),
+        lte: endOfYearUtc(query.year),
+      };
+    }
+
+    const period = query.period ?? "mensal";
+    const { start, end } = this.getPeriodFilter(period);
+    return { gte: start, lte: end };
+  }
+
   async listTransactions(userId: string, query: TransactionsQueryDto) {
     await this.ensureSeedCategories();
 
-    const period = query.period ?? "mensal";
     const page = query.page ?? 1;
     const type = query.type;
 
-    const { start, end } = this.getPeriodFilter(period);
-
     const where: Prisma.TransactionWhereInput = {
       userId,
-      transactionDate: { gte: start, lte: end },
+      transactionDate: this.getTransactionsDateFilter(query),
       ...(type ? { type } : {}),
+      ...(query.category_id !== undefined && { categoryId: query.category_id }),
     };
 
     const [total, items] = await this.prisma.$transaction([
@@ -226,8 +267,7 @@ export class FinanceService {
     const type = dto.type;
     const category = await this.validateCategory(dto.category_id, type);
 
-    const dateIso = dto.transaction_date ?? toISODate(new Date());
-    this.assertNotFutureDate(dateIso);
+    const transactionDate = this.parseTransactionDate(dto.transaction_date);
 
     const created = await this.prisma.transaction.create({
       data: {
@@ -236,7 +276,7 @@ export class FinanceService {
         amount: dto.amount,
         type,
         categoryId: category.id,
-        transactionDate: parseISODate(dateIso)!,
+        transactionDate,
         notes: dto.notes ?? null,
       },
       include: {
@@ -262,8 +302,8 @@ export class FinanceService {
 
     await this.validateCategory(finalCategoryId, finalType);
 
-    if (dto.transaction_date) {
-      this.assertNotFutureDate(dto.transaction_date);
+    if (dto.transaction_date !== undefined) {
+      this.parseTransactionDate(dto.transaction_date);
     }
 
     const updated = await this.prisma.transaction.update({
@@ -274,7 +314,7 @@ export class FinanceService {
         ...(dto.type !== undefined && { type: dto.type }),
         ...(dto.category_id !== undefined && { categoryId: dto.category_id }),
         ...(dto.transaction_date !== undefined && {
-          transactionDate: parseISODate(dto.transaction_date)!,
+          transactionDate: this.parseTransactionDate(dto.transaction_date),
         }),
         ...(dto.notes !== undefined && { notes: dto.notes ?? null }),
       },
