@@ -64,6 +64,26 @@ export class FinanceController {
     enum: ["income", "expense"],
     description: "Filtrar por tipo",
   })
+  @ApiQuery({
+    name: "date",
+    required: false,
+    description: "Filtrar por data exata (YYYY-MM-DD)",
+  })
+  @ApiQuery({
+    name: "month",
+    required: false,
+    description: "Filtrar por mês (1 a 12)",
+  })
+  @ApiQuery({
+    name: "year",
+    required: false,
+    description: "Filtrar por ano",
+  })
+  @ApiQuery({
+    name: "category_id",
+    required: false,
+    description: "Filtrar por categoria",
+  })
   @ApiResponse({ status: 200, description: "Transações listadas com sucesso" })
   @Get("transactions")
   listTransactions(
@@ -133,4 +153,3 @@ export class FinanceController {
     return this.financeService.monthlyEvolution(user.sub, query);
   }
 }
-

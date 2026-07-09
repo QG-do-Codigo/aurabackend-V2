@@ -46,14 +46,12 @@ export class CreateTransactionDto {
 
   @ApiProperty({
     example: "2026-03-05",
-    description: "Data da transação (YYYY-MM-DD). Opcional",
-    required: false,
+    description: "Data da transação (YYYY-MM-DD)",
   })
-  @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
     message: "transaction_date deve estar no formato YYYY-MM-DD",
   })
-  transaction_date?: string;
+  transaction_date: string;
 
   @ApiProperty({
     example: "Pago via PIX",
